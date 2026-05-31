@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Тренажёр устного счёта</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#ffffff; --ink:#1f2733; --muted:#6b7686;
+    --accent:#3b6ef5; --accent-d:#2f59c9; --ok:#22a06b; --bad:#e0485a;
+    --line:#e3e8f0;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--ink); min-height:100vh;
+    display:flex; align-items:flex-start; justify-content:center; padding:16px;
+  }
+  .wrap{width:100%; max-width:680px}
+  h1{font-size:24px; margin:8px 0 16px; text-align:center}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; margin-bottom:14px; box-shadow:0 2px 10px rgba(31,39,51,.04)}
+  .muted{color:var(--muted); font-size:14px}
+  .row{display:flex; flex-wrap:wrap; gap:8px}
+  .section-title{font-weight:600; margin:6px 0 8px; font-size:15px}
+  .op-block{margin-bottom:14px}
+  .chip{
+    border:1px solid var(--line); background:#fff; color:var(--ink);
+    padding:8px 12px; border-radius:999px; font-size:14px; cursor:pointer;
+    user-select:none; transition:.12s;
+  }
+  .chip:hover{border-color:var(--accent)}
+  .chip.on{background:var(--accent); border-color:var(--accent); color:#fff}
+  .preset{
+    padding:9px 14px; border-radius:10px; border:1px solid var(--line);
+    background:#fff; cursor:pointer; font-size:14px; font-weight:600;
+  }
+  .preset:hover{border-color:var(--accent); color:var(--accent)}
+  .btn{
+    display:block; width:100%; border:none; border-radius:12px; padding:15px;
+    font-size:18px; font-weight:700; color:#fff; background:var(--accent); cursor:pointer;
+  }
+  .btn:hover{background:var(--accent-d)}
+  .btn.secondary{background:#fff; color:var(--accent); border:1px solid var(--line)}
+  .btn.secondary:hover{border-color:var(--accent)}
+  .hidden{display:none !important}
+
+  /* Game */
+  .hud{display:flex; justify-content:space-between; align-items:center; font-size:16px; font-weight:600}
+  .hud .time{font-variant-numeric:tabular-nums}
+  .timebar{height:6px; background:var(--line); border-radius:6px; overflow:hidden; margin-top:10px}
+  .timebar > i{display:block; height:100%; background:var(--accent); width:100%; transition:width 1s linear}
+  .question{font-size:46px; font-weight:700; text-align:center; padding:26px 8px 18px; letter-spacing:.5px}
+  .answer{
+    width:100%; font-size:30px; text-align:center; padding:14px; border-radius:12px;
+    border:2px solid var(--line); outline:none; font-weight:700;
+  }
+  .answer:focus{border-color:var(--accent)}
+  .answer.bad{border-color:var(--bad); background:#fff0f1}
+  .shake{animation:shake .3s}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+  .flash-ok{animation:flashok .25s}
+  @keyframes flashok{0%{background:#e8f7ef}100%{background:transparent}}
+
+  /* Results */
+  .stat-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; text-align:center}
+  .stat{background:#f7f9fc; border:1px solid var(--line); border-radius:12px; padding:14px 8px}
+  .stat .v{font-size:26px; font-weight:800}
+  .stat .l{font-size:12px; color:var(--muted); margin-top:2px}
+  .record{margin-top:12px; text-align:center; font-weight:600}
+  .badge-new{display:inline-block; background:var(--ok); color:#fff; padding:3px 10px; border-radius:999px; font-size:13px; margin-left:6px}
+  .mistakes{margin-top:14px}
+  .mistakes ul{list-style:none; padding:0; margin:8px 0 0; max-height:230px; overflow:auto}
+  .mistakes li{display:flex; justify-content:space-between; padding:8px 10px; border:1px solid var(--line); border-radius:10px; margin-bottom:6px; font-size:15px}
+  .mistakes li b{color:var(--ok)}
+  @media (max-width:480px){
+    .question{font-size:38px}
+    h1{font-size:20px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ SETUP ============ -->
+  <section id="setup">
+    <h1>🧮 Тренажёр устного счёта</h1>
+
+    <div class="card">
+      <div class="section-title">Быстрый выбор</div>
+      <div class="row">
+        <button class="preset" data-preset="easy">Лёгкий</button>
+        <button class="preset" data-preset="medium">Средний</button>
+        <button class="preset" data-preset="hard">Сложный</button>
+        <button class="preset" data-preset="clear">Очистить</button>
+      </div>
+    </div>
+
+    <div class="card" id="ops"></div>
+
+    <div class="card">
+      <div class="section-title">Время</div>
+      <div class="row" id="times"></div>
+    </div>
+
+    <button class="btn" id="startBtn">Старт</button>
+    <p class="muted" id="startHint" style="text-align:center"></p>
+    <p class="muted" style="text-align:center;opacity:.55;font-size:12px;margin:4px 0 0">сборка 3 · все типы задач равновероятны (по 20%)</p>
+  </section>
+
+  <!-- ============ GAME ============ -->
+  <section id="game" class="hidden">
+    <div class="card">
+      <div class="hud">
+        <span>Решено: <span id="solvedCount">0</span></span>
+        <span class="time" id="timeLeft">00:00</span>
+      </div>
+      <div class="timebar"><i id="timeFill"></i></div>
+    </div>
+    <div class="card">
+      <div class="question" id="question">…</div>
+      <input class="answer" id="answer" type="text" inputmode="numeric" autocomplete="off" placeholder="ответ">
+      <button class="btn" id="checkBtn" style="margin-top:12px">Проверить</button>
+    </div>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section id="results" class="hidden">
+    <h1>Результат</h1>
+    <div class="card">
+      <div class="stat-grid">
+        <div class="stat"><div class="v" id="rSolved">0</div><div class="l">решено</div></div>
+        <div class="stat"><div class="v" id="rAcc">0%</div><div class="l">с 1-й попытки</div></div>
+        <div class="stat"><div class="v" id="rSpeed">0</div><div class="l">задач/мин</div></div>
+      </div>
+      <div class="record" id="rRecord"></div>
+    </div>
+    <div class="card mistakes">
+      <div class="section-title">Где спотыкался</div>
+      <div id="rMistakes"></div>
+    </div>
+    <button class="btn" id="againBtn">Ещё раз</button>
+    <button class="btn secondary" id="backBtn" style="margin-top:10px">В настройки</button>
+  </section>
+
+</div>
+
+<script>
+"use strict";
+
+/* ---------- helpers ---------- */
+const rand = (min,max)=>Math.floor(Math.random()*(max-min+1))+min;
+const gcd  = (a,b)=>{while(b){[a,b]=[b,a%b];}return a;};
+const fmt  = n=>n.toLocaleString('ru-RU');
+const DIG  = {1:[1,9],2:[10,99],3:[100,999],4:[1000,9999]};
+
+/* ---------- generators ---------- */
+function addGen(d){const[mn,mx]=DIG[d];const a=rand(mn,mx),b=rand(mn,mx);return{text:`${fmt(a)} + ${fmt(b)}`,answer:a+b};}
+function subGen(d){const[mn,mx]=DIG[d];let a=rand(mn,mx),b=rand(mn,mx);if(a<b)[a,b]=[b,a];return{text:`${fmt(a)} − ${fmt(b)}`,answer:a-b};}
+function mulGen(d1,d2){const[a1,a2]=DIG[d1],[b1,b2]=DIG[d2];const a=rand(a1,a2),b=rand(b1,b2);return{text:`${fmt(a)} × ${fmt(b)}`,answer:a*b};}
+function divGen(dvMin,dvMax,qMin,qMax,maxDiv=1000){
+  let d,qHi,tries=0;
+  do{ d=rand(dvMin,dvMax); qHi=Math.min(qMax,Math.floor(maxDiv/d)); tries++; }
+  while(qHi<qMin && tries<25);
+  if(qHi<qMin) qHi=qMin;               // запасной вариант (срабатывает крайне редко)
+  const q=rand(qMin,qHi);
+  return{text:`${fmt(d*q)} ÷ ${fmt(d)}`,answer:q};
+}
+function pctGen(percents,Nmin,Nmax){
+  const P=percents[rand(0,percents.length-1)];
+  const step=100/gcd(100,P);
+  const kMin=Math.max(1,Math.ceil(Nmin/step)), kMax=Math.floor(Nmax/step);
+  const N=step*rand(kMin,kMax);
+  return{text:`${P}% от ${fmt(N)}`,answer:P*N/100};
+}
+const PCT_5  = Array.from({length:19},(_,i)=>(i+1)*5);     // 5..95
+const PCT_ANY= Array.from({length:99},(_,i)=>i+1);          // 1..99
+
+/* ---------- operations & levels ---------- */
+const OPERATIONS = [
+  {name:'Сложение', levels:[
+    {id:'add1',name:'однозначные',  gen:()=>addGen(1)},
+    {id:'add2',name:'двузначные',   gen:()=>addGen(2)},
+    {id:'add3',name:'трёхзначные',  gen:()=>addGen(3)},
+    {id:'add4',name:'четырёхзначные',gen:()=>addGen(4)},
+  ]},
+  {name:'Вычитание', levels:[
+    {id:'sub1',name:'однозначные',  gen:()=>subGen(1)},
+    {id:'sub2',name:'двузначные',   gen:()=>subGen(2)},
+    {id:'sub3',name:'трёхзначные',  gen:()=>subGen(3)},
+    {id:'sub4',name:'четырёхзначные',gen:()=>subGen(4)},
+  ]},
+  {name:'Умножение', levels:[
+    {id:'m11',name:'1×1', gen:()=>mulGen(1,1)},
+    {id:'m12',name:'1×2', gen:()=>mulGen(1,2)},
+    {id:'m13',name:'1×3', gen:()=>mulGen(1,3)},
+    {id:'m14',name:'1×4', gen:()=>mulGen(1,4)},
+    {id:'m22',name:'2×2', gen:()=>mulGen(2,2)},
+    {id:'m23',name:'2×3', gen:()=>mulGen(2,3)},
+    {id:'m24',name:'2×4', gen:()=>mulGen(2,4)},
+    {id:'m33',name:'3×3', gen:()=>mulGen(3,3)},
+  ]},
+  {name:'Деление (нацело)', levels:[
+    {id:'d1',name:'на однозначное (просто)', gen:()=>divGen(2,9,2,9)},
+    {id:'d2',name:'на однозначное',          gen:()=>divGen(2,9,11,99)},
+    {id:'d3',name:'на двузначное',           gen:()=>divGen(11,99,2,9)},
+    {id:'d4',name:'на двузначное (сложно)',  gen:()=>divGen(11,99,11,99)},
+  ]},
+  {name:'Проценты', levels:[
+    {id:'p1',name:'круглые %',   gen:()=>pctGen([10,20,25,50],20,400)},
+    {id:'p2',name:'кратные 5%',  gen:()=>pctGen(PCT_5,20,400)},
+    {id:'p3',name:'любые %',     gen:()=>pctGen(PCT_ANY,100,900)},
+  ]},
+];
+const LEVEL_MAP = {};
+OPERATIONS.forEach(op=>op.levels.forEach(l=>LEVEL_MAP[l.id]=l));
+
+const TIMES = [1,3,5,10];
+const PRESETS = {
+  easy:  {levels:['add2','sub2','m11','p1'], minutes:5},
+  medium:{levels:['add2','add3','sub2','sub3','m11','m12','m13','m14','d2','p1','p2'], minutes:5},
+  hard:  {levels:['add2','add3','add4','sub2','sub3','sub4','m11','m12','m13','m22','d2','d4','p3'], minutes:5},
+  clear: {levels:[], minutes:5},
+};
+
+/* ---------- state ---------- */
+const selected = new Set();
+let selMinutes = 5;
+let game = null;
+let lastConfig = null;
+
+/* ---------- DOM ---------- */
+const $ = id=>document.getElementById(id);
+const elSetup=$('setup'), elGame=$('game'), elResults=$('results');
+
+/* ---------- build setup UI ---------- */
+function buildOps(){
+  const root=$('ops'); root.innerHTML='';
+  OPERATIONS.forEach(op=>{
+    const block=document.createElement('div'); block.className='op-block';
+    block.innerHTML=`<div class="section-title">${op.name}</div>`;
+    const row=document.createElement('div'); row.className='row';
+    op.levels.forEach(l=>{
+      const c=document.createElement('div'); c.className='chip'; c.textContent=l.name; c.dataset.id=l.id;
+      c.onclick=()=>{ c.classList.toggle('on'); if(selected.has(l.id))selected.delete(l.id);else selected.add(l.id); updateHint(); };
+      row.appendChild(c);
+    });
+    block.appendChild(row); root.appendChild(block);
+  });
+}
+function buildTimes(){
+  const root=$('times'); root.innerHTML='';
+  TIMES.forEach(t=>{
+    const c=document.createElement('div'); c.className='chip'+(t===selMinutes?' on':''); c.textContent=t+' мин'; c.dataset.t=t;
+    c.onclick=()=>{ selMinutes=t; [...root.children].forEach(x=>x.classList.toggle('on',+x.dataset.t===t)); };
+    root.appendChild(c);
+  });
+}
+function syncChips(){
+  document.querySelectorAll('#ops .chip').forEach(c=>c.classList.toggle('on',selected.has(c.dataset.id)));
+  document.querySelectorAll('#times .chip').forEach(c=>c.classList.toggle('on',+c.dataset.t===selMinutes));
+}
+function updateHint(){
+  $('startHint').textContent = selected.size? '' : 'Выбери хотя бы один тип задач';
+}
+function applyPreset(name){
+  const p=PRESETS[name];
+  selected.clear(); p.levels.forEach(id=>selected.add(id));
+  selMinutes=p.minutes; syncChips(); updateHint();
+}
+
+/* ---------- game ---------- */
+function pickQuestion(groups){
+  let q, tries=0;
+  do{
+    const g=groups[rand(0,groups.length-1)];   // 1) равновероятно выбираем ТИП операции
+    q=g[rand(0,g.length-1)].gen();             // 2) затем случайный уровень внутри типа
+    tries++;
+  } while(game && q.text===game.lastText && tries<8);
+  return q;
+}
+function fmtTime(s){const m=Math.floor(s/60),x=s%60;return String(m).padStart(2,'0')+':'+String(x).padStart(2,'0');}
+
+function startGame(config){
+  lastConfig=config;
+  const selSet=new Set(config.levels);
+  // группируем выбранные уровни по операциям: каждый ТИП получает равный шанс (5 типов → по 20%)
+  const groups=OPERATIONS.map(op=>op.levels.filter(l=>selSet.has(l.id))).filter(g=>g.length);
+  game={ groups, minutes:config.minutes, total:config.minutes*60, left:config.minutes*60,
+         solved:0, firstTry:0, mistakes:[], lastText:null, current:null, erred:false, timer:null, over:false };
+  elSetup.classList.add('hidden'); elResults.classList.add('hidden'); elGame.classList.remove('hidden');
+  $('solvedCount').textContent='0';
+  renderTime();
+  nextQuestion();
+  $('answer').focus();
+  game.timer=setInterval(tick,1000);
+}
+function tick(){
+  game.left--; renderTime();
+  if(game.left<=0) endGame();
+}
+function renderTime(){
+  $('timeLeft').textContent=fmtTime(Math.max(0,game.left));
+  $('timeFill').style.width=(100*game.left/game.total)+'%';
+}
+function nextQuestion(){
+  game.current=pickQuestion(game.groups);
+  game.lastText=game.current.text; game.erred=false;
+  $('question').textContent=game.current.text+' =';
+  const a=$('answer'); a.value=''; a.classList.remove('bad'); a.focus();
+}
+function check(){
+  if(game.over) return;
+  const raw=$('answer').value.trim();
+  if(raw==='') return;
+  const val=Number(raw.replace(',','.'));
+  if(Number.isFinite(val) && val===game.current.answer){
+    game.solved++; if(!game.erred) game.firstTry++;
+    $('solvedCount').textContent=game.solved;
+    $('question').classList.remove('flash-ok'); void $('question').offsetWidth; $('question').classList.add('flash-ok');
+    nextQuestion();
+  } else {
+    if(!game.erred){ game.erred=true; game.mistakes.push({text:game.current.text,answer:game.current.answer}); }
+    const a=$('answer');
+    a.classList.add('bad'); a.classList.remove('shake'); void a.offsetWidth; a.classList.add('shake');
+    a.value=''; a.focus();
+  }
+}
+function endGame(){
+  game.over=true; clearInterval(game.timer);
+  elGame.classList.add('hidden'); elResults.classList.remove('hidden');
+  const acc=game.solved? Math.round(100*game.firstTry/game.solved):0;
+  const speed=Math.round(10*game.solved/game.minutes)/10;
+  $('rSolved').textContent=game.solved;
+  $('rAcc').textContent=acc+'%';
+  $('rSpeed').textContent=speed;
+  renderRecord();
+  renderMistakes();
+}
+function renderMistakes(){
+  const box=$('rMistakes');
+  if(!game.mistakes.length){ box.innerHTML='<p class="muted">Ошибок нет — чисто! 🎯</p>'; return; }
+  const items=game.mistakes.map(m=>`<li><span>${m.text} =</span> <b>${fmt(m.answer)}</b></li>`).join('');
+  box.innerHTML=`<ul>${items}</ul>`;
+}
+
+/* ---------- records (localStorage) ---------- */
+const REC_KEY='mentalmath_records';
+function configKey(){ return [...lastConfig.levels].sort().join(',')+'@'+lastConfig.minutes; }
+function loadRecords(){ try{return JSON.parse(localStorage.getItem(REC_KEY))||{};}catch(e){return{};} }
+function renderRecord(){
+  const recs=loadRecords(), key=configKey(), prev=recs[key]||0;
+  let html='';
+  if(game.solved>prev){
+    recs[key]=game.solved;
+    try{localStorage.setItem(REC_KEY,JSON.stringify(recs));}catch(e){}
+    html=`Рекорд режима: ${game.solved}<span class="badge-new">новый рекорд!</span>`;
+  } else {
+    html=`Рекорд режима: ${prev}`;
+  }
+  $('rRecord').innerHTML=html;
+}
+
+/* ---------- events ---------- */
+$('startBtn').onclick=()=>{
+  if(!selected.size){ updateHint(); return; }
+  startGame({levels:[...selected], minutes:selMinutes});
+};
+$('checkBtn').onclick=check;
+$('answer').addEventListener('keydown',e=>{ if(e.key==='Enter') check(); });
+$('againBtn').onclick=()=>startGame(lastConfig);
+$('backBtn').onclick=()=>{ elResults.classList.add('hidden'); elSetup.classList.remove('hidden'); };
+document.querySelectorAll('.preset').forEach(b=>b.onclick=()=>applyPreset(b.dataset.preset));
+
+/* ---------- init ---------- */
+buildOps(); buildTimes(); applyPreset('hard');
+</script>
+</body>
+</html>
