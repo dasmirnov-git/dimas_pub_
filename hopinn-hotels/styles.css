@@ -199,3 +199,7 @@
   .component-value>span{font-size:12px}
   .calculator-results.web-only{grid-template-columns:1fr;gap:18px}
 }
+@media screen and (max-width:360px){
+  /* Give wrapped descriptions room while retaining exact sector proportions. */
+  .terms .price-components{height:660px}
+}

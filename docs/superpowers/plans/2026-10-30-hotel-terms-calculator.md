@@ -1,6 +1,6 @@
 # Hotel Terms Calculator Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Add the approved live price calculator to the existing hotel terms slide and publish it on GitHub Pages.
 
@@ -33,10 +33,10 @@
 
 **Interfaces:** `calculateBreakdown(price: number, discount: number, fee: number)` returns rackCents, discountCents, guestCents, feeCents, hotelCents, fullDiscountCents, discountPercent, feePercent, feeSharePercent, hotelSharePercent and fullDiscountPercent. Invalid input throws RangeError.
 
-- [ ] Write Node tests for the default values 1000000/400000/600000/90000/510000 cents, fullDiscount 490000 cents and 49%; the nine expected full discounts 39.1/39.8/40.5, 47.8/48.4/49, 56.5/57/57.5; price 20000 with 30/13; kopeck totals; invalid input and unsupported options.
-- [ ] Run `node --test tests/price-breakdown.test.mjs`; expect missing-module failure.
-- [ ] Implement integer-cent arithmetic and shares in the pure module.
-- [ ] Run the test command; expect all tests passing. Commit this unit.
+- [x] Write Node tests for the default values 1000000/400000/600000/90000/510000 cents, fullDiscount 490000 cents and 49%; the nine expected full discounts 39.1/39.8/40.5, 47.8/48.4/49, 56.5/57/57.5; price 20000 with 30/13; kopeck totals; invalid input and unsupported options.
+- [x] Run `node --test tests/price-breakdown.test.mjs`; expect missing-module failure.
+- [x] Implement integer-cent arithmetic and shares in the pure module.
+- [x] Run the test command; expect all tests passing. Commit this unit.
 
 ### Task 2: UI, print and publication
 
@@ -44,13 +44,13 @@
 
 **Interfaces:** Consume calculateBreakdown from Task 1; update chart CSS variables and explicit result targets, preserve printed text.
 
-- [ ] Confirm the current slide has no controls; this is the missing behavior before implementation.
-- [ ] Add labelled input/selects above the chart and default amounts. Show price-for-guest and full-discount summary. Use the existing Onest/purple/gold style; keep hints concise.
-- [ ] Bind input/change/submit events; validate price, update amounts and aria label, clear error after correction. Hide controls when JS is absent.
-- [ ] Add screen-only ratio rules and results. Keep printed default labels and chart geometry; add Rack rate in shared caption. Version changed CSS/JS/PDF URLs.
-- [ ] Verify all 9 combinations via core tests and exercise UI at 1280/745/390 px, including empty price and recovery. Check no-JS default view, keyboard labels/focus and absence of overlap.
-- [ ] Export print after changing inputs as well as default state; rendered PDF should be independent of the active inputs. Compare 8 pages to baseline: only page 5 may differ for Rack rate.
-- [ ] Run full tests, JS syntax and diff checks. Commit; obtain one fresh whole-branch review; address material findings with regression tests.
+- [x] Confirm the current slide has no controls; this is the missing behavior before implementation.
+- [x] Add labelled input/selects above the chart and default amounts. Show price-for-guest and full-discount summary. Use the existing Onest/purple/gold style; keep hints concise.
+- [x] Bind input/change/submit events; validate price, update amounts and aria label, clear error after correction. Hide controls when JS is absent.
+- [x] Add screen-only ratio rules and results. Keep printed default labels and chart geometry; add Rack rate in shared caption. Version changed CSS/JS/PDF URLs.
+- [x] Verify all 9 combinations via core tests and exercise UI at 1280/745/390 px, including empty price and recovery. Check no-JS default view, keyboard labels/focus and absence of overlap.
+- [x] Export print after changing inputs as well as default state; rendered PDF should be independent of the active inputs. Compare 8 pages to baseline: only page 5 may differ for Rack rate.
+- [x] Run full tests, JS syntax and diff checks. Commit; obtain one fresh whole-branch review; address material findings with regression tests.
 ## Publication after the whole-branch review
 
-- [ ] Publish reviewed commits to existing GitHub main branch; verify Pages success, live calculator, noindex, updated PDF and save screenshot.
+Publish reviewed commits to existing GitHub main branch; verify Pages success, live calculator, noindex, updated PDF and save screenshot.
