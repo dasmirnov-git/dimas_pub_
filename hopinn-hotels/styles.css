@@ -153,3 +153,49 @@
   .mechanics-layout{margin-top:32px}
   .mechanics .steps li{font-size:18px}
 }
+
+/* Live terms calculator. Print uses the original fixed geometry and labels. */
+.web-only{display:none}
+@media screen{
+  .web-only{display:block}
+  .terms .print-copy{display:none}
+  .calculator-controls.web-only{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:24px;margin-top:28px;padding:20px 24px;background:var(--lavender);border:1px solid var(--line);border-radius:20px}
+  .calculator-controls label{display:block;min-width:0;font-size:14px;line-height:1.5;font-weight:600;color:var(--purple)}
+  .calculator-controls input,.calculator-controls select{display:block;width:100%;min-width:0;height:48px;margin-top:8px;padding:10px 14px;border:1px solid #b89bc9;border-radius:10px;background:white;color:var(--ink);font:500 19px/1.3 Onest,Arial,sans-serif;font-variant-numeric:tabular-nums}
+  .calculator-input{position:relative;display:block}.calculator-input input{padding-right:43px}.calculator-input>span{position:absolute;right:15px;top:12px;color:var(--muted);font-size:18px}
+  .calculator-controls input:focus-visible,.calculator-controls select:focus-visible{outline:3px solid var(--purple);outline-offset:3px}
+  .calculator-controls input[aria-invalid="true"]{border-color:#a12630}
+  .calculator-error{grid-column:1/-1;font-size:14px;line-height:1.5;color:#a12630;font-weight:400;max-width:none}
+  .terms .economics-layout{margin-top:32px;align-items:start}
+  .terms .price-components{height:500px}
+  .terms .discount-component{height:var(--discount-share,40%)}
+  .terms .fee-component{top:var(--discount-share,40%);height:var(--fee-share,9%)}
+  .terms .hotel-component{top:calc(var(--discount-share,40%) + var(--fee-share,9%));height:var(--hotel-share,51%)}
+  .terms .component-copy h3{font-size:21px;margin-bottom:8px}
+  .terms .component-value.web-only{display:flex;align-items:baseline;flex-wrap:wrap;gap:5px 12px;margin-bottom:8px;color:var(--purple);font-variant-numeric:tabular-nums}
+  .component-value output{font-size:27px;line-height:1.2;font-weight:600;letter-spacing:-.025em;overflow-wrap:anywhere}
+  .component-value>span{font-size:13px;color:var(--muted);white-space:nowrap}
+  .terms .component-copy p:not(.component-value){font-size:14px;line-height:1.5}
+  .terms .structure-caption.web-only{font-size:12px;margin-top:18px;line-height:1.5}
+  .calculator-results.web-only{display:grid;grid-template-columns:1fr 1.2fr;gap:20px;margin-top:22px;padding:20px 0 0;border-top:1px solid var(--line)}
+  .calculator-results>div{min-width:0}.calculator-results>div>span{display:block;font-size:13px;line-height:1.5;color:var(--muted)}
+  .calculator-results output,.calculator-results strong{display:block;margin-top:5px;font-size:22px;line-height:1.3;color:var(--purple);font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+  .calculator-results small{display:block;margin-top:5px;font-size:11px;line-height:1.45;color:var(--muted)}
+  .calculator-results .reference-label{display:inline;font-size:11px}
+  .terms-comments{padding-top:34px}
+}
+@media screen and (max-width:1000px){
+  .terms .economics-layout{gap:32px}
+  .calculator-controls.web-only{gap:18px;padding:20px}
+  .terms-comments{padding-top:0}
+}
+@media screen and (max-width:600px){
+  .calculator-controls.web-only{grid-template-columns:1fr;gap:18px;padding:20px;margin-top:24px}
+  .calculator-controls input,.calculator-controls select{font-size:18px}
+  .terms .price-components{height:520px}
+  .terms .component-copy h3{font-size:19px}
+  .terms .component-copy p:not(.component-value){font-size:13px}
+  .component-value output{font-size:25px}
+  .component-value>span{font-size:12px}
+  .calculator-results.web-only{grid-template-columns:1fr;gap:18px}
+}

@@ -51,4 +51,6 @@
 - [ ] Verify all 9 combinations via core tests and exercise UI at 1280/745/390 px, including empty price and recovery. Check no-JS default view, keyboard labels/focus and absence of overlap.
 - [ ] Export print after changing inputs as well as default state; rendered PDF should be independent of the active inputs. Compare 8 pages to baseline: only page 5 may differ for Rack rate.
 - [ ] Run full tests, JS syntax and diff checks. Commit; obtain one fresh whole-branch review; address material findings with regression tests.
+## Publication after the whole-branch review
+
 - [ ] Publish reviewed commits to existing GitHub main branch; verify Pages success, live calculator, noindex, updated PDF and save screenshot.

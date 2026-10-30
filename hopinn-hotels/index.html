@@ -8,8 +8,9 @@
 <meta name="description" content="Платформа слепого бронирования Hopinn. Монетизация незагруженных номеров, условия и подключение для отелей 4–5 звёзд.">
 <link rel="icon" href="assets/brand/logo.svg" type="image/svg+xml">
 <link rel="preload" href="assets/fonts/onest-cyrillic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="styles.css?v=6"><link rel="stylesheet" href="print.css" media="print">
+<link rel="stylesheet" href="styles.css?v=20261030-calc"><link rel="stylesheet" href="print.css" media="print">
 <script type="module" src="app.mjs"></script>
+<script type="module" src="terms-calculator.mjs?v=20261030"></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Перейти к содержанию</a>
@@ -18,7 +19,7 @@
 <nav aria-label="Разделы презентации">
 <a href="#problem">Задача</a><a href="#mechanics">Как работает</a><a href="#value">Ценность</a><a href="#terms">Условия</a><a href="#legal">Договоры</a><a href="#integration">Подключение</a><a href="#join">Контакты</a>
 </nav>
-<a class="download button-small" href="Hopinn-for-hotels.pdf?v=20261030" rel="nofollow" download>Скачать PDF <span aria-hidden="true">↓</span></a>
+<a class="download button-small" href="Hopinn-for-hotels.pdf?v=20261030-calc" rel="nofollow" download>Скачать PDF <span aria-hidden="true">↓</span></a>
 </header>
 <main id="main">
 <section class="slide hero" id="intro" aria-labelledby="title-1">
@@ -97,15 +98,26 @@
 <section class="slide terms" id="terms" aria-labelledby="title-5">
 <div class="section-top"><span class="page-index">05 / 08</span></div>
 <h2 id="title-5">Условия</h2>
+<form id="terms-calculator" class="calculator-controls web-only" aria-label="Калькулятор условий" novalidate hidden>
+<label for="calc-price">Цена номера за ночь<span class="calculator-input"><input id="calc-price" name="price" type="number" inputmode="decimal" min="0.01" step="0.01" value="10000" required aria-describedby="calc-error"><span aria-hidden="true">₽</span></span></label>
+<label for="calc-discount">Скидка клиенту<select id="calc-discount" name="discount"><option value="30">30%</option><option value="40" selected>40%</option><option value="50">50%</option></select></label>
+<label for="calc-fee">Сервисный сбор<select id="calc-fee" name="fee"><option value="13">13%</option><option value="14">14%</option><option value="15" selected>15%</option></select></label>
+<p id="calc-error" class="calculator-error" role="alert" hidden>Введите положительную цену с точностью до копеек. Пока показан предыдущий расчёт.</p>
+</form>
 <div class="economics-layout">
 <figure class="price-structure">
-<figcaption>Полная цена номера <span>Основной тариф</span></figcaption>
-<div class="price-components" role="group" aria-label="Иллюстрация структуры цены: скидка 40%, сбор 9%, доход отеля 51%">
-<div class="price-component discount-component"><div class="price-segment" aria-hidden="true"></div><div class="component-copy"><p class="discount-label"><strong>Скидка для клиента 30%, 40% или 50%</strong> — чем выше, тем больше спрос. Управляет отель.</p></div></div>
-<div class="price-component fee-component"><div class="price-segment" aria-hidden="true"></div><div class="component-copy"><h3>Сервисный сбор Hopinn</h3><p><strong>До 15% от цены заказа со скидкой для гостя.</strong></p></div></div>
-<div class="price-component hotel-component"><div class="price-segment" aria-hidden="true"></div><div class="component-copy"><h3>Доход отеля</h3><p><strong>Ежемесячная сверка</strong> завершённых заказов и взаиморасчёты по согласованному отчёту.</p></div></div>
+<figcaption>Полная цена номера <span>Основной тариф (Rack rate)</span></figcaption>
+<div class="price-components" role="group" aria-label="Распределение полной цены номера">
+<div class="price-component discount-component"><div class="price-segment" aria-hidden="true"></div><div class="component-copy"><h3 class="web-only">Скидка клиенту</h3><p class="component-value web-only"><output data-calc="discount" for="calc-price calc-discount calc-fee" aria-live="off">4 000 ₽</output><span data-calc="discount-share">40% тарифа</span></p><p class="discount-label print-copy"><strong>Скидка для клиента 30%, 40% или 50%</strong> — чем выше, тем больше спрос. Управляет отель.</p></div></div>
+<div class="price-component fee-component"><div class="price-segment" aria-hidden="true"></div><div class="component-copy"><h3>Сервисный сбор Hopinn</h3><p class="component-value web-only"><output data-calc="fee" for="calc-price calc-discount calc-fee" aria-live="off">900 ₽</output><span data-calc="fee-share">9% тарифа</span></p><p class="component-detail web-only" data-calc="fee-description">15% от цены заказа со скидкой для гостя.</p><p class="print-copy"><strong>До 15% от цены заказа со скидкой для гостя.</strong></p></div></div>
+<div class="price-component hotel-component"><div class="price-segment" aria-hidden="true"></div><div class="component-copy"><h3>Доход отеля</h3><p class="component-value web-only"><output data-calc="hotel" for="calc-price calc-discount calc-fee" aria-live="off">5 100 ₽</output><span data-calc="hotel-share">51% тарифа</span></p><p><strong>Ежемесячная сверка</strong> завершённых заказов и взаиморасчёты по согласованному отчёту.</p></div></div>
 </div>
-<p class="structure-caption">Иллюстрация структуры цены</p>
+<p class="structure-caption print-copy">Иллюстрация структуры цены</p>
+<p class="structure-caption web-only">Чем выше скидка клиенту, тем больше спрос. Управляет отель.</p>
+<div class="calculator-results web-only" aria-live="polite" aria-atomic="true">
+<div><span>Цена для гостя</span><output data-calc="guest" for="calc-price calc-discount calc-fee" aria-live="off">6 000 ₽</output><small>Сервисный сбор уже включён</small></div>
+<div><span>Полная скидка отеля <small class="reference-label">· справочно</small></span><strong data-calc="full-discount">49% · 4 900 ₽</strong><small>Скидка клиенту + сервисный сбор</small></div>
+</div>
 </figure>
 <ul class="terms-comments"><li><strong>Ситуативный инструмент:</strong> вы сами выбираете даты, категории и количество номеров для продажи через Hopinn.</li><li>Скидка на проживание <strong>не распространяется на завтрак и дополнительные услуги.</strong> Сервисный сбор Hopinn начисляется и на стоимость завтрака.</li></ul>
 </div>
